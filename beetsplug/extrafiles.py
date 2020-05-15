@@ -83,7 +83,8 @@ class ExtraFilesPlugin(beets.plugins.BeetsPlugin):
 
         self.register_listener('item_moved', self.on_item_moved)
         self.register_listener('item_copied', self.on_item_copied)
-        self.register_listener('cli_exit', self.on_cli_exit)
+#        self.register_listener('cli_exit', self.on_cli_exit)
+        self.register_listener('album_imported', self.on_album_imported)
 
     def on_item_moved(self, item, source, destination):
         """Run this listener function on item_moved events."""
@@ -100,6 +101,15 @@ class ExtraFilesPlugin(beets.plugins.BeetsPlugin):
 
         files = self.gather_files(self._moved_items)
         self.process_items(files, action=self._move_file)
+
+    def on_album_imported(self, lib):
+        files = self.gather_files(self._copied_items)
+        self.process_items(files, action=self._copy_file)
+
+        files = self.gather_files(self._moved_items)
+        self.process_items(files, action=self._move_file)
+        self._copied_items = set()
+        self._moved_items = set()
 
     def _copy_file(self, path, dest):
         """Copy path to dest."""
